@@ -1,22 +1,9 @@
-var position = function (posX, posY, width, height, color) { //para saber se colidiu
-    this.posX = posX;
+// MONTA OS QUADRADOS(ROBÔS E OBSTÁCULOS)
+const quadrado = function (posX, posY, width, height, color, velocidade) { //parametros
+    this.posX = posX; //this é umca constante, ou seja: peque a posição x DESSE objeto
     this.posY = posY;
     this.width = width;
     this.height = height;
     this.color = color;
-    this.visible = true;
-}
-
-position.prototype.halfWidth = function () {
-    return this.width / 2;
-}
-position.prototype.halfHeight = function () {
-    return this.height / 2;
-}
-
-position.prototype.centerX = function () {
-    return this.posX + this.halfWidth();
-}
-position.prototype.centerY = function () {
-    return this.posY + this.halfHeight();
-}
+    this.velocidade = velocidade; //é o que faz andar, ele está literalmente se movendo? Não, ele sendo reposicionado
+} //isso está passando todas as propriedades(td o que compôem o objeto)

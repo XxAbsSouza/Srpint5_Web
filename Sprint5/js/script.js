@@ -1,191 +1,102 @@
-(function(){
-    let canvas = document.querySelector('#canvas')
-    let ctx = canvas.getContext("2d");
-    let blk;
+(function () {
+    const cnv = document.querySelector('#canvas');
+    const ctx = cnv.getContext('2d');
 
-    const LEFT = 37
-    const UP = 38
-    const RIGHT = 39
-    const DOWN = 40;
+    //movimentos
+    let moveLeft = false;
+    let moveUp = false;
+    let moveRight = false;
+    let moveDown = false; //pq false? pq se n o bicho vai andar. E quando ele tem q andar? quando apertar a tecla
 
-    const A = 65;
-    const W = 87;
-    const D = 68;
-    const S = 83;
+    // arrays
+    const quadrados = []; //pq? preciso montar esse cara, para exibir na tela, jogar dentro do array pq se n, teria q criar uma variável para cada quadrado que vc desejaria colocar
 
-    let mvLeft = mvUp = mvRight = mvDown = false;
-    let plLeft = plUp = plRight = plDown = false;
 
-    let square = [];
-    let blocks = [];
+    // quadrados
+    const quadrado1 = new quadrado(20, 10, 50, 70, "#f60", 5); //velocidade é quanto ele empurra. 5 = px
+    quadrados.push(quadrado1); //push coloca no fim do array
 
-    // let img1 = new Image();
-    // img1.addEventListener('load', function(){
-    //     ctx.drawImage(this, 20, 20, 60, 60, 5)
-    // })
-    // img1.scr = 'images/Layer 0.png'
+    const quadrado2 = new quadrado(100, 120, 550, 50, "#000", 0);
+    quadrados.push(quadrado2);
 
-    const player1 = new square(20, 10, 60, 60, "#f60", 5); 
-    square.push(player1); 
-    const player2 = new square  (20, 10, 60, 60, "#f60", 5); 
-    square.push(player2); 
+    const quadrado3 = new quadrado(400, 350, 500, 50, "#000", 0); //dizendo como eu quero o quadrado
+    quadrados.push(quadrado3);
 
-    const obstaculo1 = new blocks(100, 120, 550, 50, "#000", 0);
-    blocks.push(obstaculo1);
-    const obstaculo2 = new blocks(400, 350, 500, 50, "#000", 0); 
-    blocks.push(obstaculo2);
+    // pressionar as teclas
+    window.addEventListener('keydown', function (e) { // Window = objeto de maior hierarquia (a janela) dps vem document | keydown = fica esperando a telca ser precionada | e = é um parâmetro, recebe a tecla que foi precionada. Pq e? pq é um nome padrão mas pode chamar de qualquer coisa. Pega toda e qualquer tecla precionada
 
-    window.addEventListener('keydown', function(e) {
-        let key = e.keyCode;
-        switch (key) {
-            case LEFT:
-                mvLeft = true;
+        const nomeKey = e.key; //propriedade que retorna o nome da tecla (isso é nativo do js) | nesse e estou pegando o key, ou seja, o nome dessa tecla
+        console.log(nomeKey);
+        switch (nomeKey) { //pesquisar o que é swith
+            case 'ArrowLeft': //case = se estiver armazenado aqui faz isso
+                moveLeft = true;
+                break; //break obrigatório do switch para sair do swith
+            case 'ArrowUp':
+                moveUp = true;
                 break;
-            case UP:
-                mvUp = true;
+            case 'ArrowRight':
+                moveRight = true;
                 break;
-            case RIGHT:
-                mvRight = true;
-                break;
-            case DOWN:
-                mvDown = true;
+            case 'ArrowDown':
+                moveDown = true;
                 break;
         }
-    }, false);
+    });
 
-    window.addEventListener("keyup", function (e) {
-        let key = e.keyCode;
+    //soltar as teclas  
+    window.addEventListener('keyup', (e) => { //keyup = quando a tecla subir (quando ela deixar de ser precionada) | => == arrow function, uma notação mais nova
+        const key = e.key;
         switch (key) {
-            case LEFT:
-                mvLeft = false;
+            case 'ArrowLeft':
+                moveLeft = false;
                 break;
-            case UP:
-                mvUp = false;
+            case 'ArrowUp':
+                moveUp = false;
                 break;
-            case RIGHT:
-                mvRight = false;
+            case 'ArrowRight':
+                moveRight = false;
                 break;
-            case DOWN:
-                mvDown = false;
+            case 'ArrowDown':
+                moveDown = false;
                 break;
         }
-    }, false);
+    });
 
-    window.addEventListener("keydown", function (f) {
-        let key = f.keyCode;
-        switch (key) {
-            case A:
-                plLeft = true;
-                break;
-            case W:
-                plUp = true;
-                break;
-            case D:
-                plRight = true;
-                break;
-            case S:
-                plDown = true;
-                break;
+    function moverQuadrados() {
+        if (moveLeft && !moveRight) { //torna possível o movimento, e torna tbm impossível apertar esquerda e direita ao msm tempo
+            quadrado1.posX -= quadrado1.velocidade;
         }
-    }, false);
-
-    window.addEventListener("keyup", function (r) {
-        let key = r.keyCode;
-        switch (key) {
-            case A:
-                plLeft = false;
-                break;
-            case W:
-                plUp = false;
-                break;
-            case D:
-                plRight = false;
-                break;
-            case S:
-                plDown = false;
-                break;
+        if (moveRight && !moveLeft) {
+            quadrado1.posX += quadrado1.velocidade;
         }
-    }, false);
+        if (moveUp && !moveDown) {
+            quadrado1.posY -= quadrado1.velocidade;
+        }
+        if (moveDown && !moveUp) {
+            quadrado1.posY += quadrado1.velocidade;
+        }
 
-    function loop() {
-        window.requestAnimationFrame(loop, cnv);
-        update();
-        update2();
-        render();
+        //fiixar na tela - NÃO SAI DO CANVAS - Precisa pensar em como fazer isso com o obstáculo
+        quadrado1.posX = Math.max(0, Math.min(cnv.width - quadrado1.width, quadrado1.posX)); //Math.max = retorna o maior valor de um conjunto de valores; 12, 15, 20, 1000,  retorna 1000
+        quadrado1.posY = Math.max(0, Math.min(cnv.height - quadrado1.height, quadrado1.posY));
     }
 
-    //player 1
-    player1.velocidade = 5;
-    function update() {
-        if (mvLeft && !mvRight) {
-            player1.posX -= player1.velocidade;
-        }
-        if (mvRight && !mvLeft) {
-            player1.posX += player1.velocidade;
-        }
-        if (mvUp && !mvDown) {
-            player1.posY -= player1.velocidade;
-        }
-        if (mvDown && !mvUp) {
-            player1.posY += player1.velocidade;
-        }
 
-        player1.posX = Math.max(0, Math.min(canvas.width - player1.width, player1.posX));
-        player1.posY = Math.max(0, Math.min(canvas.height - player1.height, player1.posY));
-
-        for (let i in blocks) {
-            let blk = blocks[i];
-            if (blk.visible) {
-                blockRect(player1, blk);
-            }
-            if (blk.visible) {
-                blockRect(player1, player2);
-            }
+    function exibirQuadrados() {
+        ctx.clearRect(0, 0, cnv.width, cnv.height); //clearRect = limpando o canvas (apagando todo o conteúdo do canvas)
+        for (const i in quadrados) { //for in = substitui o for convencional; vai percorrer todo o array baseado no indice (n precisa deficnir o indice q omeça e termina e os incremetos)
+            const spr = quadrados[i]; //spr = abreviação para sprit
+            ctx.fillStyle = spr.color //fillStyle método para pintar alguém
+            ctx.fillRect(spr.posX, spr.posY, spr.width, spr.height);
         }
     }
-
-    //player 2
-    player2.velocidade = 5;
-    function update2() {
-        if (plLeft && !plRight) {
-            player2.posX -= player2.velocidade = 5;
-        }
-        if (plRight && !plLeft) {
-            player2.posX += player2.velocidade = 5;
-        }
-        if (plUp && !plDown) {
-            player2.posY -= player2.velocidade = 5;
-        }
-        if (plDown && !plUp) {
-            player2.posY += player2.velocidade = 5;
-        }
-        //Limites da tela
-        player2.posX = Math.max(0, Math.min(canvas.width - player2.width, player2.posX));
-        player2.posY = Math.max(0, Math.min(canvas.height - player2.height, player2.posY));
-
-        //Colisões
-        for (let i in blocks) {
-            var blk = blocks[i];
-            if (blk.visible) {
-                blockRect(player2, blk);
-            }
-        }
-        if (blk.visible) {
-            blockRect(player2, player1);
-        }
-
+    //solicitar uma animação ao browser e chamar a função
+    //que é a propria função atualizarTela
+    function atualizarTela() {
+        window.requestAnimationFrame(atualizarTela, cnv); //atualizarTela fica atualizando sempre | cnv = para o canvas ser limpo
+        moverQuadrados();
+        exibirQuadrados();
     }
+    atualizarTela(); //chama a função
 
-    function render() {
-        ctx.clearRect(0, 0, cnv.width, cnv.height);
-        for (let i in sprites) {
-            let spr = sprites[i];
-            if (spr.visible) {
-                ctx.fillStyle = spr.color;
-                ctx.fillRect(spr.posX, spr.posY, spr.width, spr.height);
-            }
-        }
-    }
-    loop();
-
-}())
+}()); //pq tá abrindo parentese antes da função? quando eu faço um (function(){}) eu estou encapsulando essa função e assim nenhuma variável vai funcionar fora dessa função
