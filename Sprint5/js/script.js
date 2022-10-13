@@ -1,102 +1,192 @@
-(function () {
+(function(){
     const cnv = document.querySelector('#canvas');
     const ctx = cnv.getContext('2d');
 
-    //movimentos
+    //teclas
+    const a = 65
+    const w = 87
+    const d = 68
+    const s = 83
+    const arrowLeft = 37
+    const arrowUp = 38
+    const arrowDown = 40
+    const arrowRight = 39
+    
     let moveLeft = false;
     let moveUp = false;
     let moveRight = false;
-    let moveDown = false; //pq false? pq se n o bicho vai andar. E quando ele tem q andar? quando apertar a tecla
+    let moveDown = false; 
+    let movLeft = false;
+    let movUp = false;
+    let movRight = false;
+    let movDown = false; 
+    
+    
+    let robot = []; //imagens - carinha q anda
+    let blocks = []; //carinha q n anda
 
-    // arrays
-    const quadrados = []; //pq? preciso montar esse cara, para exibir na tela, jogar dentro do array pq se n, teria q criar uma variável para cada quadrado que vc desejaria colocar
+    var player1 = new shapes(50, 700, 50, 50, "#00f", 5);
+    robot.push(player1);
 
 
-    // quadrados
-    const quadrado1 = new quadrado(20, 10, 50, 70, "#f60", 5); //velocidade é quanto ele empurra. 5 = px
-    quadrados.push(quadrado1); //push coloca no fim do array
+    let player2 = new shapes(1350, 200, 50, 50, "#f00", 5);
+    robot.push(player2);
 
-    const quadrado2 = new quadrado(100, 120, 550, 50, "#000", 0);
-    quadrados.push(quadrado2);
 
-    const quadrado3 = new quadrado(400, 350, 500, 50, "#000", 0); //dizendo como eu quero o quadrado
-    quadrados.push(quadrado3);
+    let block1 = new shapes(90, 70, 300, 350, "#000", 0);
+    robot.push(block1);
+    blocks.push(block1);
 
-    // pressionar as teclas
-    window.addEventListener('keydown', function (e) { // Window = objeto de maior hierarquia (a janela) dps vem document | keydown = fica esperando a telca ser precionada | e = é um parâmetro, recebe a tecla que foi precionada. Pq e? pq é um nome padrão mas pode chamar de qualquer coisa. Pega toda e qualquer tecla precionada
+    let block2 = new shapes(700, 90, 400, 400, "#000", 0);
+    robot.push(block2);
+    blocks.push(block2);
 
-        const nomeKey = e.key; //propriedade que retorna o nome da tecla (isso é nativo do js) | nesse e estou pegando o key, ou seja, o nome dessa tecla
-        console.log(nomeKey);
-        switch (nomeKey) { //pesquisar o que é swith
-            case 'ArrowLeft': //case = se estiver armazenado aqui faz isso
-                moveLeft = true;
-                break; //break obrigatório do switch para sair do swith
-            case 'ArrowUp':
-                moveUp = true;
-                break;
-            case 'ArrowRight':
-                moveRight = true;
-                break;
-            case 'ArrowDown':
-                moveDown = true;
-                break;
+    let block3 = new shapes(420, 600, 1000, 100, "#000", 0);
+    robot.push(block3);
+    blocks.push(block3);
+    //evento teclas
+
+        //1
+    window.addEventListener('keydown', function(e){
+        let key = e.keyCode
+        switch(key) {
+            case a:
+                moveLeft = true
+                break
+            case arrowRight:
+                moveRight = true
+                break
+            case arrowUp:
+                moveUp = true
+                break
+            case arrowDown:
+                moveDown = true
+                break
         }
-    });
+    })
+    window.addEventListener('keyup', function(e){
+        let key = e.keyCode
+        switch(key) {
+            case arrowLeft:
+                moveLeft = false
+                break
+            case arrowRight:
+                moveRight = false
+                break
+            case arrowUp:
+                moveUp = false
+                break
+            case arrowDown:
+                moveDown = false
+                break
+        }
+    })
+        //2
+    window.addEventListener('keydown', function(r){
+        let key = r.keyCode
+        switch(key) {
+            case a:
+                movLeft = true
+                break
+            case d:
+                movRight = true
+                break
+            case w:
+                movUp = true
+                break
+            case s:
+                movDown = true
+                break
+        }
+    })
+    window.addEventListener('keyup', function(r){
+        let key = r.keyCode
+        switch(key) {
+            case a:
+                movLeft = false
+                break
+            case d:
+                movRight = false
+                break
+            case w:
+                movUp = false
+                break
+            case s:
+                movDown = false
+                break
+        }
+    })
 
-    //soltar as teclas  
-    window.addEventListener('keyup', (e) => { //keyup = quando a tecla subir (quando ela deixar de ser precionada) | => == arrow function, uma notação mais nova
-        const key = e.key;
-        switch (key) {
-            case 'ArrowLeft':
-                moveLeft = false;
-                break;
-            case 'ArrowUp':
-                moveUp = false;
-                break;
-            case 'ArrowRight':
-                moveRight = false;
-                break;
-            case 'ArrowDown':
-                moveDown = false;
-                break;
+    function loop() {
+        window.requestAnimationFrame(loop, cnv);
+        update();
+        update2();
+        render();
+    }
+    
+    function update(){
+        if(moveLeft && !moveRight){
+            player1.posX -= player1.velocidade
         }
-    });
-
-    function moverQuadrados() {
-        if (moveLeft && !moveRight) { //torna possível o movimento, e torna tbm impossível apertar esquerda e direita ao msm tempo
-            quadrado1.posX -= quadrado1.velocidade;
+        if(moveRight && !moveLeft){
+            player1.posX += player1.velocidade
         }
-        if (moveRight && !moveLeft) {
-            quadrado1.posX += quadrado1.velocidade;
+        if(moveUp && !moveDown){
+            player1.posX -= player1.velocidade
         }
-        if (moveUp && !moveDown) {
-            quadrado1.posY -= quadrado1.velocidade;
-        }
-        if (moveDown && !moveUp) {
-            quadrado1.posY += quadrado1.velocidade;
+        if(moveDown && !moveUp){
+            player1.posX += player1.velocidade
         }
 
-        //fiixar na tela - NÃO SAI DO CANVAS - Precisa pensar em como fazer isso com o obstáculo
-        quadrado1.posX = Math.max(0, Math.min(cnv.width - quadrado1.width, quadrado1.posX)); //Math.max = retorna o maior valor de um conjunto de valores; 12, 15, 20, 1000,  retorna 1000
-        quadrado1.posY = Math.max(0, Math.min(cnv.height - quadrado1.height, quadrado1.posY));
+        player1.posX = Math.max(0, Math.min(cnv.width - player1.width, player1.posX));
+        player1.posY = Math.max(0, Math.min(cnv.height - player1.height, player1.posY));
+
+        for(let i in blocks) {
+            let blk = blocks[i];
+            if(blk.visible){
+                blockRect(player1, blk);
+            }
+            if(blk.visible){
+                blockRect(player1, player2);
+            }
+        }
     }
 
+    function update2(){
+        if(movLeft && !movRight){
+            player2.posX -= player2.velocidade
+        }
+        if(movRight && !movLeft){
+            player2.posX += player2.velocidade
+        }
+        if(movUp && !movDown){
+            player2.posX -= player2.velocidade
+        }
+        if(movDown && !movUp){
+            player2.posX += player2.velocidade
+        }
 
-    function exibirQuadrados() {
-        ctx.clearRect(0, 0, cnv.width, cnv.height); //clearRect = limpando o canvas (apagando todo o conteúdo do canvas)
-        for (const i in quadrados) { //for in = substitui o for convencional; vai percorrer todo o array baseado no indice (n precisa deficnir o indice q omeça e termina e os incremetos)
-            const spr = quadrados[i]; //spr = abreviação para sprit
-            ctx.fillStyle = spr.color //fillStyle método para pintar alguém
-            ctx.fillRect(spr.posX, spr.posY, spr.width, spr.height);
+        player2.posX = Math.max(0, Math.min(cnv.width - player2.width, player2.posX));
+        player2.posY = Math.max(0, Math.min(cnv.height - player2.height, player2.posY));
+
+        for(let i in blocks) {
+            let blk = blocks[i];
+            if(blk.visible){
+                blockRect(player2, blk);
+            }
+            if(blk.visible){
+                blockRect(player2, player2);
+            }
         }
     }
-    //solicitar uma animação ao browser e chamar a função
-    //que é a propria função atualizarTela
-    function atualizarTela() {
-        window.requestAnimationFrame(atualizarTela, cnv); //atualizarTela fica atualizando sempre | cnv = para o canvas ser limpo
-        moverQuadrados();
-        exibirQuadrados();
-    }
-    atualizarTela(); //chama a função
 
-}()); //pq tá abrindo parentese antes da função? quando eu faço um (function(){}) eu estou encapsulando essa função e assim nenhuma variável vai funcionar fora dessa função
+    function render(){
+        ctx.clearReact(0,0,cnv.width,cnv.height)
+        for(const i in robot) {
+            const shape = robot[i]
+            ctx.fillStyle = shape.color
+            ctx.fillRect(shape.posX, shape.posY, shape.width, shape.height)
+        }
+    }
+    loop()
+}())
