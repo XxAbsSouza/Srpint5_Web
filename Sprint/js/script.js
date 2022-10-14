@@ -2,7 +2,7 @@ let canvas = document.querySelector("#canvas")
 let cnvs = canvas.getContext("2d")
 
 
-canvas.width = 1024
+canvas.width = 1124
 canvas.height = 576
 
 cnvs.fillRect(0, 0, canvas.width, canvas.height)
