@@ -32,6 +32,16 @@ const background = new Sprite({
     },
     imageSrc: 'image/background/background_layer_1.png'
 })
+const stars = new Sprite({
+    position: {
+        x: 0,
+        y: 150
+    },
+    imageSrc: 'image/stars.jpg',
+    scale : 1,
+    framesMax: 6
+
+})
 
 const player1 = new Fighter({
     position: {
@@ -71,6 +81,8 @@ const player2 = new Fighter({
 
 
 
+
+
 const keys = {
     a: {
         pressed: false
@@ -99,6 +111,7 @@ function animate() {
     cnvs.fillStyle = 'black'
     cnvs.fillRect(0, 0, canvas.width, canvas.height)
     background.update()
+    stars.update()
     player1.update()
     player2.update()
 
